@@ -196,6 +196,7 @@ tbody tr:hover{background:rgba(194,160,82,.05)}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 td.unit{color:var(--cream);font-weight:500}
 .badge{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;border:1px solid var(--line);color:var(--gold-l);background:rgba(194,160,82,.07)}
+.badge.com{background:linear-gradient(135deg,var(--gold-l),var(--gold-d));color:#0a2a1e;border-color:transparent;font-weight:600}
 tr.totalrow td{background:rgba(194,160,82,.09);color:var(--cream);font-weight:600;font-family:'Cormorant Garamond';font-size:16px}
 
 /* calculator */
@@ -516,11 +517,12 @@ footer{border-top:1px solid var(--line);padding:48px 0 40px;margin-top:40px}
         <div class="hint">Tažením upravte parametry scénáře.</div>
         <div class="ctrl"><div class="top"><span class="lab">Akviziční cena</span><span class="val" id="v_acq"></span></div><input type="range" id="s_acq" min="120" max="280" step="1" value="175"></div>
         <div class="ctrl"><div class="top"><span class="lab">Náklady na rekonstrukci</span><span class="val" id="v_reno"></span></div><input type="range" id="s_reno" min="25000" max="65000" step="1000" value="45000"></div>
-        <div class="ctrl"><div class="top"><span class="lab">Prodejní cena jednotek</span><span class="val" id="v_sale"></span></div><input type="range" id="s_sale" min="150000" max="290000" step="1000" value="215000"></div>
+        <div class="ctrl"><div class="top"><span class="lab">Prodejní cena bytů</span><span class="val" id="v_sale"></span></div><input type="range" id="s_sale" min="150000" max="290000" step="1000" value="215000"></div>
+        <div class="ctrl"><div class="top"><span class="lab">Prodejní cena nebyt. prostor</span><span class="val" id="v_com"></span></div><input type="range" id="s_com" min="50000" max="200000" step="5000" value="110000"></div>
         <div class="ctrl"><div class="top"><span class="lab">Doba projektu</span><span class="val" id="v_mon"></span></div><input type="range" id="s_mon" min="12" max="42" step="1" value="24"></div>
         <div class="ctrl"><div class="top"><span class="lab">Podíl bankovního financování (LTC)</span><span class="val" id="v_ltc"></span></div><input type="range" id="s_ltc" min="0" max="75" step="5" value="60"></div>
         <div class="assum">
-          <div class="ar"><span>Prodejní plocha</span><b>1 990 m²</b></div>
+          <div class="ar"><span>Plocha byty / nebyt.</span><b>1 722 / 268 m²</b></div>
           <div class="ar"><span>Úroková sazba financování</span><b>8 % p.a.</b></div>
           <div class="ar"><span>Akviziční náklady (právní, DD)</span><b>2 % z ceny</b></div>
           <div class="ar"><span>Projekt, inženýring, TDS, povolení</span><b>6 % z rekonstr.</b></div>
@@ -531,7 +533,7 @@ footer{border-top:1px solid var(--line);padding:48px 0 40px;margin-top:40px}
 
       <div class="results">
         <div class="hl">
-          <div class="hlcard glass"><div class="l">Výnos z rozprodeje</div><div class="v" id="r_gross"></div><div class="s">1 990 m² × prodejní cena</div></div>
+          <div class="hlcard glass"><div class="l">Výnos z rozprodeje</div><div class="v" id="r_gross"></div><div class="s">byty + nebytové prostory</div></div>
           <div class="hlcard glass"><div class="l">Celkové náklady</div><div class="v" id="r_cost"></div><div class="s">akvizice + stavba + náklady</div></div>
           <div class="hlcard profit"><div class="l">Hrubý zisk projektu</div><div class="v" id="r_profit"></div><div class="s" id="r_margin"></div></div>
         </div>
@@ -564,7 +566,7 @@ footer{border-top:1px solid var(--line);padding:48px 0 40px;margin-top:40px}
     <div class="sec-head reveal">
       <div class="eyebrow">Rozprodej jednotek</div>
       <h2>27 jednotek, <em>dva domy</em></h2>
-      <p class="lead">Kompletní přehled jednotek dle podkladového rent rollu se stávajícím nájmem a modelovou prodejní cenou. Odhad prodeje se přepočítává podle prodejní ceny nastavené v kalkulaci výše — nyní <b id="saletag">215 000 Kč/m²</b>.</p>
+      <p class="lead">Kompletní přehled jednotek dle podkladového rent rollu se stávajícím nájmem a modelovou prodejní cenou. Odhad prodeje se přepočítává podle cen nastavených v kalkulaci výše — byty <b id="saletag">215 000 Kč/m²</b>, nebytové prostory (parter) <b id="comtag">110 000 Kč/m²</b>. Přízemní jednotky jsou nebytové (obchody / parter).</p>
     </div>
 
     <div class="tablecard glass reveal" style="margin-bottom:26px">
@@ -666,9 +668,12 @@ const fmtMil = n => (n/1e6).toLocaleString('cs-CZ',{minimumFractionDigits:1,maxi
 const FR=[['č.11 — 4.NP, ch. vpravo','2+1',80,16200],['č.10 — 4.NP, ch. vlevo','2+1',72,16550],['č.9 — 4.NP, pavlač','2+1',73,16110],['č.8 — 3.NP, ch. vpravo','2+1',60,16420],['č.7 — 3.NP, ch. vlevo','3+1',94,18700],['č.6 — 3.NP, pavlač','2+1',77,18700],['č.4,5 — 2.NP, chodba','4+1',132,28900],['č.3 — 2.NP, pavlač','3+1',77,18700],['č.2 — 1.NP, ch. vpravo','2+1',60,15830],['č.1 — 1.NP, ch. vlevo','3+1',110,0],['přízemí','2+1',46,28000],['přízemí','1+0',22,21000],['přízemí','1+0',20,18600],['přízemí','4+0',80,27000]];
 const BL=[['č.11 — 4.NP, pavlač','3+1',76,15850],['č.10 — 4.NP, ch. vpravo','2+1',80,17700],['č.9 — 4.NP, ch. vlevo','2+1',72,17400],['č.8 — 3.NP, pavlač','2+1',76,15220],['č.7 — 3.NP, ch. vpravo','2+1',72,15931],['č.6 — 3.NP, ch. vlevo','2+1',72,16839],['č.5b — 2.NP, pavlač','1+kk',17,7650],['č.5a — 2.NP, pavlač','3+1',115,20051],['č.4 — 2.NP, chodba','3+1',100,19510],['č.3 — 1.NP, pavlač','4+1',82,15840],['č.2 — 1.NP, ch. vpravo','2+1',72,17850],['č.1 — 1.NP, ch. vlevo','2+kk',53,14850],['přízemí','—',100,23900]];
 const AREA=1990;
+const isCom=u=>u[0]==='přízemí';
+let RES_AREA=0,COM_AREA=0;
+[...FR,...BL].forEach(u=>{ if(isCom(u)) COM_AREA+=u[2]; else RES_AREA+=u[2]; });
 (function(){
   let frA=0,frR=0,blA=0,blR=0;
-  const row=u=>`<tr><td class="unit">${u[0]}</td><td><span class="badge">${u[1]}</span></td><td class="num">${u[2]} m²</td><td class="num">${u[3]?fmt(u[3])+' Kč':'—'}</td><td class="num sale" data-area="${u[2]}"></td></tr>`;
+  const row=u=>{const c=isCom(u);return `<tr><td class="unit">${u[0]}${c?' — parter':''}</td><td><span class="badge${c?' com':''}">${c?'nebytový':u[1]}</span></td><td class="num">${u[2]} m²</td><td class="num">${u[3]?fmt(u[3])+' Kč':'—'}</td><td class="num sale" data-area="${u[2]}" data-com="${c?1:0}"></td></tr>`;};
   document.getElementById('fr_body').innerHTML=FR.map(u=>{frA+=u[2];frR+=u[3];return row(u);}).join('');
   document.getElementById('bl_body').innerHTML=BL.map(u=>{blA+=u[2];blR+=u[3];return row(u);}).join('');
   document.getElementById('fr_area').textContent=frA;document.getElementById('fr_rent').textContent=fmt(frR);
@@ -676,14 +681,14 @@ const AREA=1990;
 })();
 
 /* calc */
-const ids={acq:'s_acq',reno:'s_reno',sale:'s_sale',mon:'s_mon',ltc:'s_ltc'},els={};
+const ids={acq:'s_acq',reno:'s_reno',sale:'s_sale',com:'s_com',mon:'s_mon',ltc:'s_ltc'},els={};
 Object.entries(ids).forEach(([k,id])=>els[k]=document.getElementById(id));
 function setTrack(el){const min=+el.min,max=+el.max;el.style.setProperty('--p',((+el.value-min)/(max-min)*100)+'%');}
 const segDef=[['Akvizice','#7a9b7e'],['Rekonstrukce','#3f7a52'],['Soft cost','#9b8a55'],['Prodej & marketing','#5f8c8f'],['Financování','#a76a4e'],['Hrubý zisk','#c2a052']];
 function calc(){
   Object.values(els).forEach(setTrack);
-  const acq=(+els.acq.value)*1e6, renoRate=+els.reno.value, saleRate=+els.sale.value, months=+els.mon.value, ltc=(+els.ltc.value)/100;
-  const reno=renoRate*AREA, gross=saleRate*AREA;
+  const acq=(+els.acq.value)*1e6, renoRate=+els.reno.value, saleRate=+els.sale.value, comRate=+els.com.value, months=+els.mon.value, ltc=(+els.ltc.value)/100;
+  const reno=renoRate*AREA, gross=saleRate*RES_AREA + comRate*COM_AREA;
   const acqCost=acq*0.02, projCost=reno*0.06, conting=reno*0.10, soft=acqCost+projCost+conting, salesCost=gross*0.03;
   const hardBase=acq+acqCost+reno+projCost+conting, debt=hardBase*ltc;
   const financing=debt*0.08*(months/12)*0.65;
@@ -693,6 +698,7 @@ function calc(){
   document.getElementById('v_acq').textContent=fmtMil(acq);
   document.getElementById('v_reno').textContent=fmt(renoRate)+' Kč/m²';
   document.getElementById('v_sale').textContent=fmt(saleRate)+' Kč/m²';
+  document.getElementById('v_com').textContent=fmt(comRate)+' Kč/m²';
   document.getElementById('v_mon').textContent=months+' měs.';
   document.getElementById('v_ltc').textContent=(ltc*100).toFixed(0)+' %';
   document.getElementById('r_gross').textContent=fmtMil(gross);
@@ -726,7 +732,8 @@ function calc(){
   requestAnimationFrame(()=>cmp.querySelectorAll('.col').forEach(c=>c.style.height=c.dataset.h+'%'));
 
   document.getElementById('saletag').textContent=fmt(saleRate)+' Kč/m²';
-  document.querySelectorAll('td.sale').forEach(td=>td.textContent=fmt((+td.dataset.area)*saleRate)+' Kč');
+  document.getElementById('comtag').textContent=fmt(comRate)+' Kč/m²';
+  document.querySelectorAll('td.sale').forEach(td=>{const r=td.dataset.com==='1'?comRate:saleRate;td.textContent=fmt((+td.dataset.area)*r)+' Kč';});
   document.getElementById('units_total').textContent=fmtMil(gross);
 }
 Object.values(els).forEach(el=>el.addEventListener('input',calc));
